@@ -1,0 +1,253 @@
+:host {
+  display: block;
+}
+
+.product-list {
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --surface: #ffffff;
+  --accent: #2563eb;
+  --danger: #ef4444;
+}
+
+.product-list__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.product-list__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.product-list__subtitle {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.product-list__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 40px;
+  padding: 0 1rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.product-list__btn:hover {
+  background: #1d4ed8;
+}
+
+.product-list__btn-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.product-list__table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+  padding: 0.95rem 1.1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.product-table thead th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  border-bottom: 1px solid var(--border);
+  background: #fafbfc;
+}
+
+.product-table tbody td {
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.product-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.product-table tbody tr:hover td {
+  background: #fafbfc;
+}
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 260px;
+}
+
+.product-cell__thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.product-cell__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.product-cell__name {
+  font-weight: 650;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.product-cell__desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.product-table__price {
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.product-table__muted {
+  color: #4b5563;
+}
+
+.product-table__stock {
+  font-weight: 500;
+}
+
+.product-table__stock.is-empty {
+  color: var(--danger);
+  font-weight: 650;
+}
+
+.product-table__actions-col {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.status-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-badge.is-active {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.status-badge.is-active .status-badge__dot {
+  background: #10b981;
+}
+
+.status-badge.is-inactive {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.status-badge.is-inactive .status-badge__dot {
+  background: #9ca3af;
+}
+
+.product-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.product-actions__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.product-actions__btn:hover {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.product-actions__btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 900px) {
+  .product-list__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .product-list__btn {
+    align-self: flex-start;
+  }
+
+  .product-list__table-wrap {
+    overflow-x: auto;
+  }
+
+  .product-table {
+    min-width: 780px;
+  }
+}
