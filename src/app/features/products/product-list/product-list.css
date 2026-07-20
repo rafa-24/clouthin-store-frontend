@@ -11,6 +11,17 @@
   --danger: #ef4444;
 }
 
+.product-list__status {
+  margin: 0;
+  padding: 1.25rem 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.product-list__status--error {
+  color: var(--danger);
+}
+
 .product-list__header {
   display: flex;
   align-items: flex-start;
