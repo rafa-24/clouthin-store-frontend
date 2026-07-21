@@ -1,14 +1,15 @@
-import { Component, output } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ProductCreatePayload } from '../model/product.model';
+import { ProductService } from '../services/product';
 
 export interface ProductFormValue {
   name: string;
-  description: string;
+  category: string;
   price: number | null;
   stock: number | null;
-  category: string;
   imageUrl: string;
-  active: boolean;
 }
 
 @Component({
@@ -18,24 +19,25 @@ export interface ProductFormValue {
   styleUrl: './product-form-modal.css',
 })
 export class ProductFormModal {
-  readonly close = output<void>();
-  readonly saved = output<ProductFormValue>();
+  private readonly productService = inject(ProductService);
 
-  readonly categories = ['Electrónica', 'Ropa', 'Hogar', 'Deportes', 'Libros'];
-  readonly placeholderImage = '/product-placeholder.png';
+  readonly close = output<void>();
+  readonly saved = output<void>();
+
+  readonly submitted = signal(false);
+  readonly submitting = signal(false);
+  readonly submitError = signal<string | null>(null);
 
   form: ProductFormValue = {
     name: '',
-    description: '',
+    category: '',
     price: null,
     stock: null,
-    category: '',
     imageUrl: '',
-    active: true,
   };
 
   get previewImage(): string {
-    return this.form.imageUrl.trim() || this.placeholderImage;
+    return this.form.imageUrl.trim() || '/product-placeholder.png';
   }
 
   onCancel(): void {
@@ -43,10 +45,84 @@ export class ProductFormModal {
   }
 
   onSubmit(): void {
-    this.saved.emit({
-      ...this.form,
-      imageUrl: this.form.imageUrl.trim() || this.placeholderImage,
+    this.submitted.set(true);
+    this.submitError.set(null);
+
+    if (!this.isFormValid()) {
+      return;
+    }
+
+    const payload: ProductCreatePayload = {
+      name: this.form.name.trim(),
+      category: this.form.category.trim(),
+      price: Number(this.form.price),
+      stock: Number(this.form.stock),
+      image: this.form.imageUrl.trim(),
+    };
+
+    console.log('Producto creado con exito:', payload);
+
+    this.submitting.set(true);
+
+    this.productService.create(payload).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.saved.emit();
+        this.close.emit();
+      },
+      error: (err: unknown) => {
+        console.error('Error al crear el producto', err);
+        this.submitting.set(false);
+        this.submitError.set(this.getErrorMessage(err));
+      },
     });
-    this.close.emit();
+  }
+
+  isFieldInvalid(field: keyof ProductFormValue): boolean {
+    if (!this.submitted()) {
+      return false;
+    }
+
+    const value = this.form[field];
+
+    if (typeof value === 'string') {
+      return value.trim().length === 0;
+    }
+
+    return value === null || value === undefined || Number.isNaN(Number(value));
+  }
+
+  private isFormValid(): boolean {
+    return (
+      this.form.name.trim().length > 0 &&
+      this.form.category.trim().length > 0 &&
+      this.form.imageUrl.trim().length > 0 &&
+      this.form.price !== null &&
+      this.form.price !== undefined &&
+      !Number.isNaN(Number(this.form.price)) &&
+      this.form.stock !== null &&
+      this.form.stock !== undefined &&
+      !Number.isNaN(Number(this.form.stock))
+    );
+  }
+
+  private getErrorMessage(err: unknown): string {
+    const fallback = 'No se pudo crear el producto. Intenta de nuevo.';
+
+    if (!(err instanceof HttpErrorResponse)) {
+      return fallback;
+    }
+
+    const apiMessage = err.error?.message;
+
+    if (Array.isArray(apiMessage) && apiMessage.length > 0) {
+      return apiMessage.join('. ');
+    }
+
+    if (typeof apiMessage === 'string' && apiMessage.trim()) {
+      return apiMessage;
+    }
+
+    return fallback;
   }
 }

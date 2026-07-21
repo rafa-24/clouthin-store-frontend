@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { Product, ProductListResponse } from '../model/product.model';
+import { Product, ProductListResponse, ProductCreatePayload, ProductCreateResponse } from '../model/product.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -12,5 +12,10 @@ export class ProductService {
     return this.http
       .get<ProductListResponse>(this.baseUrl)
       .pipe(map((response) => response.data));
+  }
+
+  create(payload: ProductCreatePayload): Observable<string> {
+    return this.http.post<ProductCreateResponse>(this.baseUrl, payload)
+      .pipe(map((response) => response.message));
   }
 }

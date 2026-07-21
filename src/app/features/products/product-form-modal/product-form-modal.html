@@ -20,22 +20,8 @@
     </button>
   </header>
 
-  <form class="modal__form" (ngSubmit)="onSubmit()">
-    <div class="preview">
-      <img
-        class="preview__img"
-        [src]="previewImage"
-        alt="Vista previa del producto"
-        width="64"
-        height="64"
-      />
-      <div class="preview__meta">
-        <span class="preview__label">Imagen del producto</span>
-        <span class="preview__hint">Se usará la imagen por defecto si no hay URL</span>
-      </div>
-    </div>
-
-    <div class="field">
+  <form class="modal__form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="field" [class.field--invalid]="isFieldInvalid('name')">
       <label class="field__label" for="name">
         Nombre <span class="field__required">*</span>
       </label>
@@ -46,27 +32,31 @@
         class="field__input"
         placeholder="Ej. Auriculares inalámbricos"
         [(ngModel)]="form.name"
-        required
       />
+      @if (isFieldInvalid('name')) {
+        <p class="field__error">El nombre es obligatorio.</p>
+      }
     </div>
 
-    <div class="field">
-      <label class="field__label" for="description">
-        Descripción <span class="field__required">*</span>
+    <div class="field" [class.field--invalid]="isFieldInvalid('category')">
+      <label class="field__label" for="category">
+        Categoría <span class="field__required">*</span>
       </label>
       <input
-        id="description"
-        name="description"
+        id="category"
+        name="category"
         type="text"
         class="field__input"
-        placeholder="Describe brevemente el producto..."
-        [(ngModel)]="form.description"
-        required
+        placeholder="Ej. Ropa, Hombre, Accesorios..."
+        [(ngModel)]="form.category"
       />
+      @if (isFieldInvalid('category')) {
+        <p class="field__error">La categoría es obligatoria.</p>
+      }
     </div>
 
     <div class="field-row">
-      <div class="field">
+      <div class="field" [class.field--invalid]="isFieldInvalid('price')">
         <label class="field__label" for="price">
           Precio <span class="field__required">*</span>
         </label>
@@ -81,12 +71,14 @@
             class="field__input field__input--prefixed"
             placeholder="0.00"
             [(ngModel)]="form.price"
-            required
           />
         </div>
+        @if (isFieldInvalid('price')) {
+          <p class="field__error">El precio es obligatorio.</p>
+        }
       </div>
 
-      <div class="field">
+      <div class="field" [class.field--invalid]="isFieldInvalid('stock')">
         <label class="field__label" for="stock">
           Stock <span class="field__required">*</span>
         </label>
@@ -98,31 +90,31 @@
           class="field__input"
           placeholder="0"
           [(ngModel)]="form.stock"
-          required
         />
+        @if (isFieldInvalid('stock')) {
+          <p class="field__error">El stock es obligatorio.</p>
+        }
       </div>
     </div>
 
-    <div class="field">
-      <label class="field__label" for="category">
-        Categoría <span class="field__required">*</span>
-      </label>
-      <select
-        id="category"
-        name="category"
-        class="field__input field__select"
-        [(ngModel)]="form.category"
-        required
-      >
-        <option value="" disabled>Selecciona una categoría...</option>
-        @for (category of categories; track category) {
-          <option [value]="category">{{ category }}</option>
-        }
-      </select>
+    <div class="preview">
+      <img
+        class="preview__img"
+        [src]="previewImage"
+        alt="Vista previa del producto"
+        width="64"
+        height="64"
+      />
+      <div class="preview__meta">
+        <span class="preview__label">Imagen del producto</span>
+        <span class="preview__hint">La URL de imagen es obligatoria</span>
+      </div>
     </div>
 
-    <div class="field">
-      <label class="field__label" for="imageUrl">URL de imagen</label>
+    <div class="field" [class.field--invalid]="isFieldInvalid('imageUrl')">
+      <label class="field__label" for="imageUrl">
+        URL de imagen <span class="field__required">*</span>
+      </label>
       <input
         id="imageUrl"
         name="imageUrl"
@@ -131,32 +123,21 @@
         placeholder="https://..."
         [(ngModel)]="form.imageUrl"
       />
+      @if (isFieldInvalid('imageUrl')) {
+        <p class="field__error">La URL de imagen es obligatoria.</p>
+      }
     </div>
 
-    <div class="status-box">
-      <div>
-        <p class="status-box__title">Estado</p>
-        <p class="status-box__subtitle">Visible en el catálogo</p>
-      </div>
-
-      <button
-        type="button"
-        class="toggle"
-        [class.is-on]="form.active"
-        role="switch"
-        [attr.aria-checked]="form.active"
-        (click)="form.active = !form.active"
-      >
-        <span class="toggle__thumb"></span>
-      </button>
-    </div>
+    @if (submitError()) {
+      <p class="form-error">{{ submitError() }}</p>
+    }
 
     <footer class="modal__footer">
-      <button type="button" class="btn btn--ghost" (click)="onCancel()">
+      <button type="button" class="btn btn--ghost" (click)="onCancel()" [disabled]="submitting()">
         Cancelar
       </button>
-      <button type="submit" class="btn btn--primary">
-        Guardar Producto
+      <button type="submit" class="btn btn--primary" [disabled]="submitting()">
+        {{ submitting() ? 'Guardando...' : 'Guardar Producto' }}
       </button>
     </footer>
   </form>

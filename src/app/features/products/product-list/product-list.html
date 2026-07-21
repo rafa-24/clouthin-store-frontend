@@ -13,9 +13,10 @@
     </button>
   </header>
 
-  @if(isModalOpen()) {
+  @if (isModalOpen()) {
     <app-product-form-modal
-    (close)="closeModal()"
+      (close)="closeModal()"
+      (saved)="onProductSaved()"
     />
   }
 

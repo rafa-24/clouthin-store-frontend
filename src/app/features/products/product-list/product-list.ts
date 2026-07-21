@@ -29,6 +29,10 @@ export class ProductList implements OnInit {
     this.isModalOpen.set(false);
   }
 
+  onProductSaved(): void {
+    this.loadProducts();
+  }
+
   loadProducts(): void {
     this.loading.set(true);
     this.error.set(null);
