@@ -1,59 +1,154 @@
-# AdminClothingStore
+# Admin Clothing Store (Frontend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.7.
+Panel administrativo web para gestionar el catálogo de productos de una tienda de ropa.
 
-## Development server
+Forma parte de una solución full stack:
 
-To start a local development server, run:
+| Capa | Tecnología | Rol |
+|------|------------|-----|
+| Backend | NestJS + MongoDB | API REST de productos |
+| Frontend (este repo) | Angular 22 | Panel admin: listar, crear y editar |
+| Mobile | Flutter | Catálogo para clientes (listar y detalle) |
 
-```bash
-ng serve
-```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Contexto
 
-## Code scaffolding
+Una tienda de ropa necesita administrar su catálogo desde un panel web. Este frontend consume la API del backend y permite:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Listar productos
+- Crear un producto
+- Editar un producto
 
-```bash
-ng generate component component-name
-```
+Cada producto incluye: **nombre**, **categoría**, **precio**, **stock** e **imagen (URL)**.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## Requisitos
 
-## Building
+- [Node.js](https://nodejs.org/) 20 o superior
+- npm
+- Backend de la API corriendo en `http://localhost:3000` (NestJS + MongoDB)
 
-To build the project run:
+---
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Instalación y ejecución
 
 ```bash
-ng test
+# 1. Clonar el repositorio
+git clone <url-del-repositorio>
+cd clouthin-store-frontend
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Levantar el servidor de desarrollo
+npm start
+# equivalente: npx ng serve
 ```
 
-## Running end-to-end tests
+La aplicación queda disponible en:
 
-For end-to-end (e2e) testing, run:
+**http://localhost:4200/**
+
+> Importante: el backend debe estar activo antes de usar el panel. Si la API no responde, verás errores al cargar o guardar productos.
+
+---
+
+## Configuración de la API
+
+La URL base del backend se define en los environments:
+
+- Desarrollo: `src/environments/environment.ts`
+- Producción: `src/environments/environment.production.ts`
+
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000',
+};
+```
+
+Si tu API corre en otro host o puerto, cambia solo `apiUrl`. El service construye las rutas a partir de ese valor (`/products`, etc.).
+
+---
+
+## Scripts disponibles
+
+| Comando | Descripción |
+|---------|-------------|
+| `npm start` | Servidor de desarrollo (`ng serve`) |
+| `npm run build` | Build de producción |
+| `npm run watch` | Build en modo watch (development) |
+| `npm test` | Tests unitarios (Vitest) |
+
+---
+
+## Estructura del proyecto
+
+```
+src/app/
+├── features/products/          # Feature de productos
+│   ├── model/                  # Interfaces y contratos con la API
+│   ├── services/               # ProductService (HTTP)
+│   ├── product-list/           # Listado + orquestación del modal
+│   └── product-form-modal/     # Modal create/edit
+├── layout/                     # Sidebar, navbar y layout general
+├── app.routes.ts               # Rutas
+└── app.config.ts               # Providers (router, HttpClient)
+src/environments/               # Configuración por entorno (apiUrl)
+```
+
+### Decisiones de arquitectura
+
+- **Organización por features**: la lógica de productos vive junta (modelo, service y UI).
+- **Un solo modal** para crear y editar: si recibe un producto, precarga el formulario y usa `PATCH`; si no, usa `POST`.
+- **Separación de responsabilidades**:
+  - `ProductList` orquesta la lista y abre el modal
+  - `ProductFormModal` maneja el formulario y las peticiones de guardado
+  - `ProductService` es la única capa que habla con la API
+
+---
+
+## Endpoints que consume
+
+Base: `{apiUrl}/products` (por defecto `http://localhost:3000/products`)
+
+| Método | Ruta | Uso en el panel |
+|--------|------|-----------------|
+| `GET` | `/products` | Listar productos |
+| `POST` | `/products` | Crear producto |
+| `PATCH` | `/products/:id` | Editar producto |
+
+Documentación Swagger del backend (si está levantado):  
+**http://localhost:3000/api/docs**
+
+---
+
+## Dependencias con el backend
+
+Este frontend **no funciona de forma aislada**. Necesitas:
+
+1. MongoDB disponible
+2. API NestJS corriendo (puerto 3000 por defecto)
+3. CORS habilitado en el backend (ya incluido en la API del proyecto)
+
+Consulta el README del repositorio backend para instrucciones de arranque de la API.
+
+---
+
+## Build de producción
 
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Los artefactos se generan en `dist/`. En el build de producción se usa `environment.production.ts` (reemplazo configurado en `angular.json`).
 
-## Additional Resources
+---
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Notas
+
+- Stack: Angular 22, TypeScript, RxJS, standalone components
+- Estilos con CSS por componente
+- Estado de UI con signals de Angular
