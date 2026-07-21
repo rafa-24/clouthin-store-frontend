@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ProductCreatePayload } from '../model/product.model';
+import { Product, ProductCreatePayload } from '../model/product.model';
 import { ProductService } from '../services/product';
 
 export interface ProductFormValue {
@@ -18,11 +18,15 @@ export interface ProductFormValue {
   templateUrl: './product-form-modal.html',
   styleUrl: './product-form-modal.css',
 })
-export class ProductFormModal {
+export class ProductFormModal implements OnInit {
   private readonly productService = inject(ProductService);
+
+  readonly product = input<Product | null>(null);
 
   readonly close = output<void>();
   readonly saved = output<void>();
+
+  readonly isEditMode = computed(() => !!this.product());
 
   readonly submitted = signal(false);
   readonly submitting = signal(false);
@@ -35,6 +39,21 @@ export class ProductFormModal {
     stock: null,
     imageUrl: '',
   };
+
+  ngOnInit(): void {
+    const product = this.product();
+    if (!product) {
+      return;
+    }
+
+    this.form = {
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      imageUrl: product.image,
+    };
+  }
 
   get previewImage(): string {
     return this.form.imageUrl.trim() || '/product-placeholder.png';
@@ -60,18 +79,23 @@ export class ProductFormModal {
       image: this.form.imageUrl.trim(),
     };
 
-    console.log('Producto creado con exito:', payload);
-
     this.submitting.set(true);
 
-    this.productService.create(payload).subscribe({
+    const request$ = this.isEditMode()
+      ? this.productService.update(this.product()!.id, payload)
+      : this.productService.create(payload);
+
+    request$.subscribe({
       next: () => {
         this.submitting.set(false);
         this.saved.emit();
         this.close.emit();
       },
       error: (err: unknown) => {
-        console.error('Error al crear el producto', err);
+        console.error(
+          this.isEditMode() ? 'Error al actualizar el producto' : 'Error al crear el producto',
+          err,
+        );
         this.submitting.set(false);
         this.submitError.set(this.getErrorMessage(err));
       },
@@ -107,7 +131,9 @@ export class ProductFormModal {
   }
 
   private getErrorMessage(err: unknown): string {
-    const fallback = 'No se pudo crear el producto. Intenta de nuevo.';
+    const fallback = this.isEditMode()
+      ? 'No se pudo actualizar el producto. Intenta de nuevo.'
+      : 'No se pudo crear el producto. Intenta de nuevo.';
 
     if (!(err instanceof HttpErrorResponse)) {
       return fallback;

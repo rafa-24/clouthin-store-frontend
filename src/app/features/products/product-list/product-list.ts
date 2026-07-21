@@ -16,17 +16,25 @@ export class ProductList implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly isModalOpen = signal(false);
+  readonly selectedProduct = signal<Product | null>(null);
 
   ngOnInit(): void {
     this.loadProducts();
   }
 
-  openModal(): void {
+  openCreateModal(): void {
+    this.selectedProduct.set(null);
+    this.isModalOpen.set(true);
+  }
+
+  openEditModal(product: Product): void {
+    this.selectedProduct.set(product);
     this.isModalOpen.set(true);
   }
 
   closeModal(): void {
     this.isModalOpen.set(false);
+    this.selectedProduct.set(null);
   }
 
   onProductSaved(): void {

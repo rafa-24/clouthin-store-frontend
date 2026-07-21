@@ -9,8 +9,12 @@
 >
   <header class="modal__header">
     <div>
-      <h2 id="product-modal-title" class="modal__title">Crear Producto</h2>
-      <p class="modal__subtitle">Completa los detalles del producto.</p>
+      <h2 id="product-modal-title" class="modal__title">
+        {{ isEditMode() ? 'Editar Producto' : 'Crear Producto' }}
+      </h2>
+      <p class="modal__subtitle">
+        {{ isEditMode() ? 'Modifica los detalles del producto.' : 'Completa los detalles del producto.' }}
+      </p>
     </div>
 
     <button type="button" class="modal__close" aria-label="Cerrar" (click)="onCancel()">
@@ -137,7 +141,11 @@
         Cancelar
       </button>
       <button type="submit" class="btn btn--primary" [disabled]="submitting()">
-        {{ submitting() ? 'Guardando...' : 'Guardar Producto' }}
+        @if (submitting()) {
+          Guardando...
+        } @else {
+          {{ isEditMode() ? 'Actualizar Producto' : 'Guardar Producto' }}
+        }
       </button>
     </footer>
   </form>
